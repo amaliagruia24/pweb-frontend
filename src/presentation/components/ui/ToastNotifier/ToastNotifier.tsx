@@ -51,7 +51,7 @@ export const ToastNotifier = () => {
                 toast.error(formatMessage({ id: "notifications.errors.sessionExpired" }));
             } else if (response.status === 500) {
                 toast.error(formatMessage({ id: "notifications.errors.unknownHappened" }));
-            } else if (response.headers.has("content-type") && response.headers.get("content-type")?.includes("application/json")) {
+            } else if (!response.ok && response.headers.has("content-type") && response.headers.get("content-type")?.includes("application/json")) {
                 const cloned = response.clone();
                 const error = await cloned.json();
 

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@application/*": ["application/*"],
+      "@application/*": ["application/*"], // You can add more folders here to reference the with "@" instead of with a relative path. 
       "@presentation/*": ["presentation/*"],
       "@infrastructure/*": ["infrastructure/*"]
     },
