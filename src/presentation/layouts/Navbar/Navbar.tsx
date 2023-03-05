@@ -54,12 +54,19 @@ export const Navbar = () => {
               xs={12}
               alignItems="center"
               wrap="nowrap"
-              columnSpacing={2}
+              columnSpacing={15}
             >
               <Grid container item direction="column" xs={1}>
                 <Button color="inherit">
                   <Link style={{ color: 'white' }} to={AppRoute.Users}>
                     {formatMessage({ id: "globals.users" })}
+                  </Link>
+                </Button>
+              </Grid>
+              <Grid container item direction="column" xs={1}>
+                <Button color="inherit">
+                  <Link style={{ color: 'white' }} to={AppRoute.UserFiles}>
+                    {formatMessage({ id: "globals.files" })}
                   </Link>
                 </Button>
               </Grid>

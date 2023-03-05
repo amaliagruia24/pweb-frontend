@@ -28,7 +28,7 @@ const getDefaultValues = (initialData?: UserAddFormModel) => {
     return defaultValues;
 };
 
-const useInitLoginForm = () => {
+const useInitUserAddForm = () => {
     const { formatMessage } = useIntl();
     const defaultValues = getDefaultValues();
 
@@ -82,7 +82,7 @@ const useInitLoginForm = () => {
 }
 
 export const useUserAddFormController = (onSubmit?: () => void): UserAddFormController => {
-    const { defaultValues, resolver } = useInitLoginForm();
+    const { defaultValues, resolver } = useInitUserAddForm();
     const { addUser: { mutation, key: mutationKey }, getUsers: { key: queryKey } } = useUserApi();
     const { mutateAsync: add, status } = useMutation([mutationKey], mutation);
     const queryClient = useQueryClient();
@@ -110,7 +110,7 @@ export const useUserAddFormController = (onSubmit?: () => void): UserAddFormCont
         setValue("role", event.target.value as UserRoleEnum, {
             shouldValidate: true,
         });
-    }, []);
+    }, [setValue]);
 
     return {
         actions: {

@@ -2,23 +2,25 @@ import { useIntl } from "react-intl";
 import { isUndefined } from "lodash";
 import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 import { DataLoadingContainer } from "../../LoadingDisplay";
-import { useUserTableController } from "./UserTable.controller";
-import { UserDTO } from "@infrastructure/apis/client";
-import DeleteIcon from '@mui/icons-material/Delete';
-import { UserAddDialog } from "../../Dialogs/UserAddDialog";
-import { useAppSelector } from "@application/store";
+import { useUserFileTableController } from "./UserFileTable.controller";
+import { UserFileDTO } from "@infrastructure/apis/client";
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import { dateToDateStringOrNull } from "@infrastructure/utils/dateUtils";
+import { UserFileAddDialog } from "../../Dialogs/UserFileAddDialog";
 
-const useHeader = (): { key: keyof UserDTO, name: string }[] => {
+const useHeader = (): { key: keyof UserFileDTO, name: string }[] => {
     const { formatMessage } = useIntl();
 
     return [
         { key: "name", name: formatMessage({ id: "globals.name" }) },
-        { key: "email", name: formatMessage({ id: "globals.email" }) },
-        { key: "role", name: formatMessage({ id: "globals.role" }) }
+        { key: "description", name: formatMessage({ id: "globals.description" }) },
+        { key: "user", name: formatMessage({ id: "globals.addBy" }) },
+        { key: "createdAt", name: formatMessage({ id: "globals.createdAt" }) }
     ]
 };
 
-const getRowValues = (entries: UserDTO[] | null | undefined, orderMap: { [key: string]: number }) =>
+const getRowValues = (entries: UserFileDTO[] | null | undefined, orderMap: { [key: string]: number }) =>
     entries?.map(
         entry => {
             return {
@@ -27,17 +29,21 @@ const getRowValues = (entries: UserDTO[] | null | undefined, orderMap: { [key: s
             }
         });
 
-export const UserTable = () => {
-    const { userId: ownUserId } = useAppSelector(x => x.profileReducer);
+const renders: { [key: string]: (value: any) => string | null } = {
+    createdAt: dateToDateStringOrNull,
+    user: (value) => value.name
+};
+
+export const UserFileTable = () => {
     const { formatMessage } = useIntl();
     const header = useHeader();
     const orderMap = header.reduce((acc, e, i) => { return { ...acc, [e.key]: i } }, {}) as { [key: string]: number };
     const headerValues = [...header].sort((a, b) => orderMap[a.key] - orderMap[b.key]);
-    const { handleChangePage, handleChangePageSize, pagedData, isError, isLoading, tryReload, labelDisplay, remove } = useUserTableController();
+    const { handleChangePage, handleChangePageSize, pagedData, isError, isLoading, tryReload, labelDisplay, downloadUserFile, openUserFile } = useUserFileTableController();
     const rowValues = getRowValues(pagedData?.data, orderMap);
 
     return <DataLoadingContainer isError={isError} isLoading={isLoading} tryReload={tryReload}>
-        <UserAddDialog />
+        <UserFileAddDialog />
         {!isUndefined(pagedData) && !isUndefined(pagedData?.totalCount) && !isUndefined(pagedData?.page) && !isUndefined(pagedData?.pageSize) &&
             <TablePagination
                 component="div"
@@ -65,10 +71,15 @@ export const UserTable = () => {
                 <TableBody>
                     {
                         rowValues?.map(({ data, entry }, rowIndex) => <TableRow key={`row_${rowIndex + 1}`}>
-                            {data.map((keyValue, index) => <TableCell key={`cell_${rowIndex + 1}_${index + 1}`}>{keyValue.value}</TableCell>)}
+                            {data.map((keyValue, index) => {
+                                return <TableCell key={`cell_${rowIndex + 1}_${index + 1}`}>{isUndefined(renders[keyValue.key]) ? keyValue.value : renders[keyValue.key](keyValue.value)}</TableCell>
+                            })}
                             <TableCell>
-                                {entry.id !== ownUserId && <IconButton color="error" onClick={() => remove(entry.id || '')}>
-                                    <DeleteIcon color="error" fontSize='small' />
+                                {<IconButton color="primary" onClick={() => downloadUserFile(entry)}>
+                                    <CloudDownloadIcon color="primary" fontSize='small' />
+                                </IconButton>}
+                                {entry.name?.endsWith(".pdf") && <IconButton color="primary" onClick={() => openUserFile(entry)}>
+                                    <FileOpenIcon color="primary" fontSize='small' />
                                 </IconButton>}
                             </TableCell>
                         </TableRow>)
