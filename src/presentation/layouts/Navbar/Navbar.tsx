@@ -49,7 +49,7 @@ export const Navbar = () => {
               <HomeIcon style={{ color: 'white' }} fontSize='large' />
             </Link>
           </Grid>
-          <Grid container item direction="column" xs={10}>
+          <Grid container item direction="column" xs={8}>
             {isAdmin && <Grid // If the user is logged in and it is an admin they can have new menu items shown.
               container
               item
@@ -78,7 +78,7 @@ export const Navbar = () => {
           <Grid container item direction="column" xs={1}>
             <NavbarLanguageSelector />
           </Grid>
-          <Grid container item direction="column" xs={1}>
+          <Grid container item direction="column" xs={2}>
             {!loggedIn && <Button color="inherit">  {/* If the user is not logged in show a button that redirects to the login page. */}
               <Link style={{ color: 'white' }} to={AppRoute.Login}>
                 {formatMessage({ id: "globals.login" })}

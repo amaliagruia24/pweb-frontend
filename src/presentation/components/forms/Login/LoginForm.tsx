@@ -24,7 +24,7 @@ export const LoginForm = () => {
         <Stack spacing={4} style={{ width: "100%" }}>
             <ContentCard title={formatMessage({ id: "globals.login" })}>
                 <Grid container item direction="row" xs={12} columnSpacing={4}>
-                    <Grid container item direction="column" xs={12} md={12}>
+                    <Grid container item direction="column" xs={12} md={12} style={{ marginBottom: "1rem" }}>
                         <FormControl 
                             fullWidth
                             error={!isUndefined(state.errors.email)}
