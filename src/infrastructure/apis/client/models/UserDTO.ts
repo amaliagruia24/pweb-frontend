@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { OrderDTO } from './OrderDTO';
+import {
+    OrderDTOFromJSON,
+    OrderDTOFromJSONTyped,
+    OrderDTOToJSON,
+} from './OrderDTO';
 import type { UserRoleEnum } from './UserRoleEnum';
 import {
     UserRoleEnumFromJSON,
@@ -50,6 +56,12 @@ export interface UserDTO {
      * @memberof UserDTO
      */
     role?: UserRoleEnum;
+    /**
+     * 
+     * @type {OrderDTO}
+     * @memberof UserDTO
+     */
+    order?: OrderDTO;
 }
 
 /**
@@ -75,6 +87,7 @@ export function UserDTOFromJSONTyped(json: any, ignoreDiscriminator: boolean): U
         'name': !exists(json, 'name') ? undefined : json['name'],
         'email': !exists(json, 'email') ? undefined : json['email'],
         'role': !exists(json, 'role') ? undefined : UserRoleEnumFromJSON(json['role']),
+        'order': !exists(json, 'order') ? undefined : OrderDTOFromJSON(json['order']),
     };
 }
 
@@ -91,6 +104,7 @@ export function UserDTOToJSON(value?: UserDTO | null): any {
         'name': value.name,
         'email': value.email,
         'role': UserRoleEnumToJSON(value.role),
+        'order': OrderDTOToJSON(value.order),
     };
 }
 

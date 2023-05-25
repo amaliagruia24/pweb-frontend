@@ -4,6 +4,9 @@
 export enum AppRoute {
     Index = "/",
     Login = "/login",
+    Register = "/register",
     Users = "/users",
-    UserFiles = "/user-files"
+    UserFiles = "/user-files",
+    Medicine = "/medicine",
+    Supplier = "/supplier"
 }

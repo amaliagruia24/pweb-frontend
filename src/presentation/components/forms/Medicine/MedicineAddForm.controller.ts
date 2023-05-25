@@ -1,13 +1,12 @@
-import { UserAddFormController, UserAddFormModel } from "./UserAddForm.types";
+import { MedicineAddFormController, MedicineAddFormModel } from "./MedicineAddForm.types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useIntl } from "react-intl";
 import * as yup from "yup";
 import { isUndefined } from "lodash";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserApi } from "@infrastructure/apis/api-management";
+import { useMedicineApi } from "@infrastructure/apis/api-management";
 import { useCallback } from "react";
-import { UserRoleEnum } from "@infrastructure/apis/client";
 import { SelectChangeEvent } from "@mui/material";
 import { useAppRouter } from "@infrastructure/hooks/useAppRouter";
 
@@ -15,12 +14,14 @@ import { useAppRouter } from "@infrastructure/hooks/useAppRouter";
  * Use a function to return the default values of the form and the validation schema.
  * You can add other values as the default, for example when populating the form with data to update an entity in the backend.
  */
-const getDefaultValues = (initialData?: UserAddFormModel) => {
+const getDefaultValues = (initialData?: MedicineAddFormModel) => {
     const defaultValues = {
-        email: "",
-        name: "",
-        password: "",
-        role: "" as UserRoleEnum
+        medicineName: '',
+        medicineDescription: "",
+        medicinePrice: 0,
+        medicineMeasurement: 0,
+        quantity: 0,
+
     };
 
     if (!isUndefined(initialData)) {
@@ -36,52 +37,57 @@ const getDefaultValues = (initialData?: UserAddFormModel) => {
 /**
  * Create a hook to get the validation schema.
  */
-const useInitUserAddForm = () => {
+const useInitMedicineAddForm = () => {
     const { formatMessage } = useIntl();
     const defaultValues = getDefaultValues();
 
     const schema = yup.object().shape({
-        name: yup.string()
+        medicineName: yup.string()
             .required(formatMessage(
                 { id: "globals.validations.requiredField" },
                 {
                     fieldName: formatMessage({
-                        id: "globals.name",
+                        id: "globals.medicineName",
                     }),
                 }))
-            .default(defaultValues.name),
-        email: yup.string()
+            .default(defaultValues.medicineName),
+        medicineDescription: yup.string()
             .required(formatMessage(
                 { id: "globals.validations.requiredField" },
                 {
                     fieldName: formatMessage({
-                        id: "globals.email",
+                        id: "globals.medicineDescription",
                     }),
                 }))
-            .email()
-            .default(defaultValues.email),
-        password: yup.string()
+            .default(defaultValues.medicineDescription),
+        medicinePrice: yup.number()
             .required(formatMessage(
                 { id: "globals.validations.requiredField" },
                 {
                     fieldName: formatMessage({
-                        id: "globals.password",
-                    }),
-                })),
-        role: yup.string()
-            .oneOf([ // The select input should have one of these values.
-                UserRoleEnum.Admin,
-                UserRoleEnum.Personnel,
-                UserRoleEnum.Client
-            ])
-            .required(formatMessage(
-                { id: "globals.validations.requiredField" },
-                {
-                    fieldName: formatMessage({
-                        id: "globals.role",
+                        id: "globals.medicinePrice",
                     }),
                 }))
-            .default(defaultValues.role)
+                .default(defaultValues.medicinePrice),
+        medicineMeasurement: yup.number()
+            .required(formatMessage(
+                { id: "globals.validations.requiredField" },
+                {
+                    fieldName: formatMessage({
+                        id: "globals.medicineMeasurement",
+                    }),
+                }))
+            .default(defaultValues.medicineMeasurement),
+        quantity: yup.number()
+            .required(formatMessage(
+                { id: "globals.validations.requiredField" },
+                {
+                    fieldName: formatMessage({
+                        id: "globals.quantity",
+                    }),
+                }))
+            .default(defaultValues.quantity),
+        
     });
 
     const resolver = yupResolver(schema);
@@ -92,20 +98,18 @@ const useInitUserAddForm = () => {
 /**
  * Create a controller hook for the form and return any data that is necessary for the form.
  */
-export const useUserAddFormController = (onSubmit?: () => void): UserAddFormController => {
-    const { defaultValues, resolver } = useInitUserAddForm();
+export const useMedicineAddFormController = (onSubmit?: () => void): MedicineAddFormController => {
+    const { defaultValues, resolver } = useInitMedicineAddForm();
     const { redirectToLogin } = useAppRouter();
-    const { addUser: { mutation, key: mutationKey }, getUsers: { key: queryKey } } = useUserApi();
+    const { addMedicine: { mutation, key: mutationKey }, getMedicines: { key: queryKey } } = useMedicineApi();
     const { mutateAsync: add, status } = useMutation([mutationKey], mutation);
     const queryClient = useQueryClient();
-    const submit = useCallback((data: UserAddFormModel) => // Create a submit callback to send the form data to the backend.
+    const submit = useCallback((data: MedicineAddFormModel) => // Create a submit callback to send the form data to the backend.
         add(data).then(() => {
-            redirectToLogin();
             queryClient.invalidateQueries([queryKey]); // If the form submission succeeds then some other queries need to be refresh so invalidate them to do a refresh.
 
             if (onSubmit) {
                 onSubmit();
-                
             }
         }), [add, queryClient, queryKey]);
 
@@ -115,16 +119,12 @@ export const useUserAddFormController = (onSubmit?: () => void): UserAddFormCont
         watch,
         setValue,
         formState: { errors }
-    } = useForm<UserAddFormModel>({ // Use the useForm hook to get callbacks and variables to work with the form.
+    } = useForm<MedicineAddFormModel>({ // Use the useForm hook to get callbacks and variables to work with the form.
         defaultValues, // Initialize the form with the default values.
         resolver // Add the validation resolver.
     });
 
-    const selectRole = useCallback((event: SelectChangeEvent<UserRoleEnum>) => { // Select inputs are tricky and may need their on callbacks to set the values.
-        setValue("role", event.target.value as UserRoleEnum, {
-            shouldValidate: true,
-        });
-    }, [setValue]);
+
 
     return {
         actions: { // Return any callbacks needed to interact with the form.
@@ -132,7 +132,6 @@ export const useUserAddFormController = (onSubmit?: () => void): UserAddFormCont
             submit, // Add the submit handle that needs to be passed to the submit handle.
             register, // Add the variable register to bind the form fields in the UI with the form variables.
             watch, // Add a watch on the variables, this function can be used to watch changes on variables if it is needed in some locations.
-            selectRole
         },
         computed: {
             defaultValues,

@@ -1,10 +1,11 @@
-import { LoginDTO } from "../client/models";
+import { LoginDTO, UserAddDTO } from "../client/models";
 import { AuthorizationApi } from "../client/apis";
 
 /**
  * Use constants to identify mutations and queries.
  */
 const loginMutationKey = "loginMutation";
+
 
 /**
  * Returns the an object with the callbacks that can be used for the React Query API, in this case just to login the user.
@@ -19,3 +20,4 @@ export const useLoginApi = () => {
         }
     }
 }
+

@@ -1,6 +1,7 @@
 {
     "globals.welcome": "Welcome!",
     "globals.login": "Login",
+    "globals.register": "Register",
     "globals.logout": "Logout",
     "globals.submit": "Submit",
     "globals.email": "E-mail",
@@ -19,6 +20,15 @@
     "globals.addBy": "Added by", 
     "globals.createdAt": "Created at",
     "globals.file": "File",
+    "globals.supplier": "Suppliers",
+    "globals.medicine": "Medicines",
+    "globals.medicineName": "Medicine name",
+    "globals.medicineDescription": "Description",
+    "global.globals.medicinePrice": "Price",
+    "globals.medicineMeasurement": "Measurement",
+    "globals.quantity": "Quantity",
+    "globals.addMedicine": "Add medicine",
+    "globals.alreadyAccount": "Already have an account?",
     "globals.placeholders.textInput": "Please enter {fieldName}",
     "globals.placeholders.selectInput": "Please select the {fieldName}",
     "globals.validations.requiredField": "{fieldName} is a required field!"
